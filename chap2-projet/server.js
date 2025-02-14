@@ -2,93 +2,49 @@ const http = require("http");
 const fs = require("fs");
 const path = require("path");
 
+const mimeTypes = {
+  ".html": "text/html",
+  ".jpg": "image/jpg",
+};
+
+const filePaths = {
+  "/": "index.html",
+  "/index.html": "index.html",
+  "/images.html": "images.html",
+  "/image1.html": "image1.html",
+  "/image2.html": "image2.html",
+  "/image3.html": "image3.html",
+  "/image4.html": "image4.html",
+  "/image5.html": "image5.html",
+  "/image1.jpg": "images/image1.jpg",
+  "/image2.jpg": "images/image2.jpg",
+  "/image3.jpg": "images/image3.jpg",
+  "/image4.jpg": "images/image4.jpg",
+  "/image5.jpg": "images/image5.jpg",
+  "/image1_small.jpg": "images/image1_small.jpg",
+  "/image2_small.jpg": "images/image2_small.jpg",
+  "/image3_small.jpg": "images/image3_small.jpg",
+  "/image4_small.jpg": "images/image4_small.jpg",
+  "/image5_small.jpg": "images/image5_small.jpg",
+};
+
 const server = http.createServer((request, response) => {
-  if (request.url === "/" || request.url === "/index.html") {
-    const indexPage = fs.readFileSync("./index.html", "utf-8");
-    response.writeHead(200, { "Content-Type": "text/html" });
-    response.end(indexPage);
-  } 
-  else if (request.url === "/images.html") {
-    const imagesPage = fs.readFileSync("./images.html", "utf-8");
-    response.writeHead(200, { "Content-Type": "text/html" });
-    response.end(imagesPage);
-  }
-  else if (request.url === "/image1.html") {
-    const image1 = fs.readFileSync("./image1.html");
-    response.writeHead(200, { "Content-Type": "text/html" });
-    response.end(image1);
-  }
-  else if (request.url === "/image2.html") {
-    const image2 = fs.readFileSync("./image2.html");
-    response.writeHead(200, { "Content-Type": "text/html" });
-    response.end(image2);
-  }
-  else if (request.url === "/image3.html") {
-    const image3 = fs.readFileSync("./image3.html");
-    response.writeHead(200, { "Content-Type": "text/html" });
-    response.end(image3);
-  }
-  else if (request.url === "/image4.html") {
-    const image4 = fs.readFileSync("./image4.html");
-    response.writeHead(200, { "Content-Type": "text/html" });
-    response.end(image4);
-  }
-  else if (request.url === "/image5.html") {
-    const image5 = fs.readFileSync("./image5.html");
-    response.writeHead(200, { "Content-Type": "text/html" });
-    response.end(image5);
-  }
-  else if (request.url === "/image1.jpg") {
-    const image1 = fs.readFileSync("./images/image1.jpg");
-    response.writeHead(200, { "Content-Type": "image/jpg" });
-    response.end(image1);
-  }
-  else if (request.url === "/image2.jpg") {
-    const image2 = fs.readFileSync("./images/image2.jpg");
-    response.writeHead(200, { "Content-Type": "image/jpg" });
-    response.end(image2);
-  }
-  else if (request.url === "/image3.jpg") {
-    const image3 = fs.readFileSync("./images/image3.jpg");
-    response.writeHead(200, { "Content-Type": "image/jpg" });
-    response.end(image3);
-  }
-  else if (request.url === "/image4.jpg") {
-    const image4 = fs.readFileSync("./images/image4.jpg");
-    response.writeHead(200, { "Content-Type": "image/jpg" });
-    response.end(image4);
-  }
-  else if (request.url === "/image5.jpg") {
-    const image5 = fs.readFileSync("./images/image5.jpg");
-    response.writeHead(200, { "Content-Type": "image/jpg" });
-    response.end(image5);
-  }
-  else if (request.url === "/image1_small.jpg") {
-    const image1 = fs.readFileSync("./images/image1_small.jpg");
-    response.writeHead(200, { "Content-Type": "image/jpg" });
-    response.end(image1);
-  }
-  else if (request.url === "/image2_small.jpg") {
-    const image2 = fs.readFileSync("./images/image2_small.jpg");
-    response.writeHead(200, { "Content-Type": "image/jpg" });
-    response.end(image2);
-  }
-  else if (request.url === "/image3_small.jpg") {
-    const image3 = fs.readFileSync("./images/image3_small.jpg");
-    response.writeHead(200, { "Content-Type": "image/jpg" });
-    response.end(image3);
-  }
-  else if (request.url === "/image4_small.jpg") {
-    const image4 = fs.readFileSync("./images/image4_small.jpg");
-    response.writeHead(200, { "Content-Type": "image/jpg" });
-    response.end(image4);
-  }
-  else if (request.url === "/image5_small.jpg") {
-    const image5 = fs.readFileSync("./images/image5_small.jpg");
-    response.writeHead(200, { "Content-Type": "image/jpg" });
-    response.end(image5);
-  }
-  else {
+  const filePath = filePaths[request.url];
+
+  if (filePath) {
+    const fileExtension = path.extname(filePath);
+    const contentType = mimeTypes[fileExtension] || "text/html";
+
+    fs.readFile(filePath, (err, data) => {
+      if (err) {
+        response.writeHead(500, { "Content-Type": "text/html" });
+        response.end("<h1>500 Internal Server Error</h1>");
+      } else {
+        response.writeHead(200, { "Content-Type": contentType });
+        response.end(data);
+      }
+    });
+  } else {
     response.writeHead(404, { "Content-Type": "text/html" });
     response.end("<h1>404 Not Found</h1>");
   }
